@@ -28,6 +28,8 @@ Last dependency is the [Tkinter](https://docs.python.org/2/library/tkinter.html)
 
 Arch Linux users can install Tkinter by installing `tk` package from `extra` repository. While debian-based distro users should install `python3-tk` package.
 
+This all works only if you have `python3` installed 👌
+
 ## Serving suggestion 🥘
 
 Create an executable shell script in an accessible location with following contents:
