@@ -32,12 +32,7 @@ This all works only if you have `python3` installed 👌
 
 ## Serving suggestion 🥘
 
-Create an executable shell script in an accessible location with following contents:
-```
-#!/bin/bash
-python /(full path to directory containing the file)/emoji-picker-qt.py
-```
-and bind it to a keyboard shortcut (eg. using _Custom Shortcuts_ window in KDE Plasma).
+Bind `emoji-picker-qt.py` to a keyboard shortcut as an executable script (eg. using _Custom Shortcuts_ in KDE Plasma). First line of the file takes care of running it with Python.
 
 ## Planned features (in no particular order)
 
