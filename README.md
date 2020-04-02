@@ -37,6 +37,7 @@ Bind `emoji-picker-qt.py` to a keyboard shortcut as an executable script (eg. us
 ## Planned features (in no particular order)
 
 - [ ] fuzzy search
+- [ ] fix width for 2-character emojis
 - [ ] settings  (or just `.config` support)
 - [ ] slack-style search (eg. searching for `:joy:` would give 😂)
 - [ ] category tabs

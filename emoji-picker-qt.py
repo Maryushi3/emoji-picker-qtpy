@@ -84,8 +84,9 @@ def execute_search(text):
         else:
             colIdx=0
             rowIdx+=1
-
-    highlight_emoji([0,0])
+            
+    if foundEmojiCount>0:
+        highlight_emoji([0,0])
 
 def emoji_hovered(hoveredLabel):
     parentGrid = hoveredLabel.parentWidget().layout()
