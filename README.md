@@ -39,10 +39,10 @@ Bind `emoji-picker-qt.py` to a keyboard shortcut as an executable script (eg. us
 - [ ] change emoji database to one with better (more natural) naming
 - [ ] fuzzy search
 - [ ] remove duplicated code
-- [ ] fix width for 2-character emojis
 - [ ] settings  (or just `.config` support)
 - [ ] slack-style search (eg. searching for `:joy:` would give 😂)
 - [ ] category tabs
 - [ ] get rid of global variables 
 - [ ] clean up warparound conditions
+- [x] ~~fix width for 2-character emojis~~ (fixed by installing `ttf-twemoji`)
 - [x] ~~arrow navigation (main priority)~~ (done)

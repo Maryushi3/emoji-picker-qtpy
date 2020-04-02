@@ -140,15 +140,18 @@ def highlight_emoji(newPosition):
 
     oldPosition = selectedEmojiPosition
     selectedEmojiPosition = newPosition
-
-    widgetToDeselect = emojiGridLayout.itemAtPosition(oldPosition[0],oldPosition[1]).widget()
-    widgetToDeselect.setStyleSheet("")
+    
+    widgetToDeselect = emojiGridLayout.itemAtPosition(oldPosition[0],oldPosition[1])
+    if widgetToDeselect:
+        widgetToDeselect = widgetToDeselect.widget()
+        widgetToDeselect.setStyleSheet("")
 
     global selectedEmojiChar
-    widgetToSelect = emojiGridLayout.itemAtPosition(selectedEmojiPosition[0],selectedEmojiPosition[1]).widget()
-    selectedEmojiChar = widgetToSelect.text()
-
-    widgetToSelect.setStyleSheet("QLabel{background-color: palette(highlight);}")
+    widgetToSelect = emojiGridLayout.itemAtPosition(selectedEmojiPosition[0],selectedEmojiPosition[1])
+    if widgetToSelect:
+        widgetToSelect = widgetToSelect.widget()
+        selectedEmojiChar = widgetToSelect.text()
+        widgetToSelect.setStyleSheet("QLabel{background-color: palette(highlight);}")
    
 def move_selection(direction):
     if direction=="right":
@@ -222,7 +225,7 @@ class EmojiPickerWindow(QWidget):
         self.installEventFilter(self)
 
         self.title = 'Emoji picker ＼(^o^)／'
-        self.width = 274
+        self.width = 281
         self.height = 250
 
         # start with text box centered at mouse pointer position
@@ -293,7 +296,6 @@ class EmojiPickerWindow(QWidget):
     def eventFilter(self, object, event):
         if event.type()== QEvent.WindowDeactivate or event.type()== QEvent.FocusOut:
             if (not willExitOnItsOwn):
-                pass
                 quitNicely()
         return False
 
