@@ -8,12 +8,12 @@ Because KDE Plasma's _Emoji Picker_ (`plasma.emojier`) neither goes to search te
 ## What it does? (features) 🤸
 
 - alows to search emoji by name
+- emoji can be selected using keyboard arrows
 - copies selected emoji to system clipboard
 - immediately pastes selected emoji, assuming the picker was summoned with a text box focused
 - closes on focus lost, `Esc` key pressed or emoji selected
 - displayed emoji count is limited by how many of them fit inside the widget
 
-For now it's possible to select emoji only using mouse pointer. Keyboard support coming soon!
 
 ## Dependencies 🧰
 
@@ -36,8 +36,10 @@ Bind `emoji-picker-qt.py` to a keyboard shortcut as an executable script (eg. us
 
 ## Planned features (in no particular order)
 
-- arrow navigation (main priority)
-- fuzzy search
-- settings  (or just `.config` support)
-- slack-style search (eg. searching for `:joy:` would give 😂)
-- category tabs
+- [ ] fuzzy search
+- [ ] settings  (or just `.config` support)
+- [ ] slack-style search (eg. searching for `:joy:` would give 😂)
+- [ ] category tabs
+- [ ] get rid of global variables 
+- [ ] clean up warparound conditions
+- [x] ~~arrow navigation (main priority)~~ (done)
