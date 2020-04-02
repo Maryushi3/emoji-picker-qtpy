@@ -34,9 +34,11 @@ This all works only if you have `python3` installed 👌
 
 Bind `emoji-picker-qt.py` to a keyboard shortcut as an executable script (eg. using _Custom Shortcuts_ in KDE Plasma). First line of the file takes care of running it with Python.
 
-## Planned features (in no particular order)
+## Planned things (in no particular order)
 
+- [ ] change emoji database to one with better (more natural) naming
 - [ ] fuzzy search
+- [ ] remove duplicated code
 - [ ] fix width for 2-character emojis
 - [ ] settings  (or just `.config` support)
 - [ ] slack-style search (eg. searching for `:joy:` would give 😂)
