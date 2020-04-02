@@ -1,15 +1,15 @@
 #!/usr/bin/python
 # Copyright (c) 2020 Maryushi3
 
-import sys
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
 import emoji_data_python as edp
-from Xlib import display
+import sys
 import pyautogui
-import time
+from Xlib import display
+from PyQt5.QtWidgets import QApplication, QGridLayout, QLabel, QLineEdit, QScrollArea, QVBoxLayout, QWidget
+from PyQt5.QtCore import QEvent, QSettings, Qt, pyqtSignal
+from PyQt5.QtGui import QFont
 from PyQt5 import QtTest
+
 
 # globals
 emojiGridLayout = None
@@ -54,6 +54,7 @@ def execute_emoji(char):
 def execute_search(text):
     selectedEmoji = (0,0)
     if not text or text.isspace():
+        fill_grid_with_history()
         return
 
     global emojiGridLayout
@@ -184,6 +185,10 @@ def fill_grid_with_history():
     global foundEmojiCount
     global fullRowsCount
     global lastRowEmojiCount
+
+    for i in reversed(range(emojiGridLayout.count())): 
+        emojiGridLayout.itemAt(i).widget().setParent(None)
+
     foundEmojiCount = len(historyList)
     fullRowsCount = foundEmojiCount//emojiGridColumnCount
     lastRowEmojiCount = foundEmojiCount%emojiGridColumnCount
