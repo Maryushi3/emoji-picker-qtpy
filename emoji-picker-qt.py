@@ -5,7 +5,7 @@ import emoji_data_python as edp
 import sys
 import pyautogui
 from Xlib import display
-from PyQt5.QtWidgets import QApplication, QGridLayout, QLabel, QLineEdit, QScrollArea, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QApplication, QGridLayout, QLabel, QLineEdit, QScrollArea, QSizePolicy, QStackedLayout, QVBoxLayout, QWidget
 from PyQt5.QtCore import QEvent, QSettings, Qt, pyqtSignal
 from PyQt5.QtGui import QFont
 from PyQt5 import QtTest
@@ -14,9 +14,9 @@ from PyQt5 import QtTest
 # globals
 emojiGridLayout = None
 mainWindow = None
-emojiGridColumnCount = 7
+emojiGridColumnCount = 5
 emojiGridRowCount = 4
-foundEmojiCount = 0
+emojiToShowCount = 0
 fullRowsCount = 0
 lastRowEmojiCount = 0
 emojiFontSize = 20
@@ -25,6 +25,8 @@ willExitOnItsOwn = False
 selectedEmojiChar=''
 settingsFile = None
 historyList = []
+foundAnyEmoji = True
+layoutStack = None
 
 font = QFont()
 font.setPointSize(emojiFontSize)
@@ -50,37 +52,43 @@ def execute_emoji(char):
     QtTest.QTest.qWait(250)
     quit()
 
-# searches for emoji, and fills grid with labels
-def execute_search(text):
-    selectedEmoji = (0,0)
-    if not text or text.isspace():
-        fill_grid_with_history()
-        return
+# fills grid with given char list and takes care of layout and counting
+def fill_grid_with_char_list(charList):
 
+    # for wraparound
+    global emojiToShowCount
+    global fullRowsCount
+    global lastRowEmojiCount
+    emojiToShowCount = min(len(charList),(emojiGridColumnCount*emojiGridRowCount))
+    fullRowsCount = emojiToShowCount//emojiGridColumnCount
+    lastRowEmojiCount = emojiToShowCount%emojiGridColumnCount
+    
+    global foundAnyEmoji
+    if emojiToShowCount>0:
+        foundAnyEmoji = True
+        layoutStack.setCurrentIndex(0)
+    else:
+        foundAnyEmoji = False
+        layoutStack.setCurrentIndex(1)
+
+
+    # clear grid
     global emojiGridLayout
     for i in reversed(range(emojiGridLayout.count())): 
         emojiGridLayout.itemAt(i).widget().setParent(None)
 
+    # fill with new chars
     rowIdx = 0
     colIdx = 0
-    foundEmoji = edp.find_by_name(text)
-
-    # needed for wraparound
-    global foundEmojiCount
-    global fullRowsCount
-    global lastRowEmojiCount
-    foundEmojiCount = len(foundEmoji)
-    fullRowsCount = foundEmojiCount//emojiGridColumnCount
-    lastRowEmojiCount = foundEmojiCount%emojiGridColumnCount
-
-    for emoji in foundEmoji:
+    for emoji in charList:
         if rowIdx>emojiGridRowCount-1:
             break;
 
-        label = QClickableLabel(emoji.char)
+        label = QClickableLabel(emoji)
         label.clicked.connect(execute_emoji)
         label.setFont(font)
-        label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        label.setAlignment(Qt.AlignCenter)
+        label.setMinimumHeight(49)
         emojiGridLayout.addWidget(label,rowIdx,colIdx)
         emojiGridLayout.setAlignment(label,Qt.AlignTop)
         if colIdx < emojiGridColumnCount-1:
@@ -89,15 +97,33 @@ def execute_search(text):
             colIdx=0
             rowIdx+=1
 
-    if foundEmojiCount>0:
+    emojiGridLayout.setContentsMargins(0,0,0,0)
+    emojiGridLayout.setHorizontalSpacing(0)
+    emojiGridLayout.setVerticalSpacing(0)
+
+    if emojiToShowCount>0:
         highlight_emoji([0,0])
 
+# searches for emoji, and passes them to fill_grid_with_char_list
+def execute_search(text):
+    selectedEmoji = (0,0)
+    if not text or text.isspace():
+        fill_grid_with_history()
+        return
+
+    foundEmoji = edp.find_by_name(text)
+    charList = [emoji.char for emoji in foundEmoji]
+
+    fill_grid_with_char_list(charList)
+
+# handles what to do after hovering over a given label
 def emoji_hovered(hoveredLabel):
     parentGrid = hoveredLabel.parentWidget().layout()
     hoveredIndex = parentGrid.indexOf(hoveredLabel)
     hoveredRow, hoveredColumn, _, _ = parentGrid.getItemPosition(hoveredIndex)
     highlight_emoji([hoveredRow,hoveredColumn])
 
+# selects, sets style and handles wraparound
 def highlight_emoji(newPosition):
     global selectedEmojiPosition
 
@@ -153,6 +179,7 @@ def highlight_emoji(newPosition):
         selectedEmojiChar = widgetToSelect.text()
         widgetToSelect.setStyleSheet("QLabel{background-color: palette(highlight);}")
    
+# handles direction where to move emoji selection
 def move_selection(direction):
     if direction=="right":
         highlight_emoji([sum(x) for x in zip(selectedEmojiPosition, [0,1])])
@@ -163,11 +190,13 @@ def move_selection(direction):
     elif direction=="down":
         highlight_emoji([sum(x) for x in zip(selectedEmojiPosition, [1,0])])
 
+# handles Esc
 def on_key(key):
     # test for a specific key
     if key == Qt.Key_Escape:
         quitNicely()
 
+# adds given emoji to history and saves it to config file
 def add_char_to_history(char):
     global settingsFile
     global historyList
@@ -183,37 +212,9 @@ def add_char_to_history(char):
     
     settingsFile.setValue('history/history',historyList)
 
+# wrapper around filling the grid
 def fill_grid_with_history():
-    global emojiGridLayout
-    global foundEmojiCount
-    global fullRowsCount
-    global lastRowEmojiCount
-
-    for i in reversed(range(emojiGridLayout.count())): 
-        emojiGridLayout.itemAt(i).widget().setParent(None)
-
-    foundEmojiCount = len(historyList)
-    fullRowsCount = foundEmojiCount//emojiGridColumnCount
-    lastRowEmojiCount = foundEmojiCount%emojiGridColumnCount
-
-    rowIdx = 0
-    colIdx = 0
-    for emoji in historyList:
-        if rowIdx>emojiGridRowCount-1:
-            break;
-        label = QClickableLabel(emoji)
-        label.clicked.connect(execute_emoji)
-        label.setFont(font)
-        label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        emojiGridLayout.addWidget(label,rowIdx,colIdx)
-        emojiGridLayout.setAlignment(label,Qt.AlignTop)
-        if colIdx < emojiGridColumnCount-1:
-            colIdx+=1
-        else:
-            colIdx=0
-            rowIdx+=1
-    if len(historyList)>0:
-        highlight_emoji([0,0])
+    fill_grid_with_char_list(historyList)
 
 # main app window class with inits
 class EmojiPickerWindow(QWidget):
@@ -226,7 +227,7 @@ class EmojiPickerWindow(QWidget):
 
         self.title = 'Emoji picker ＼(^o^)／'
         self.width = 281
-        self.height = 250
+        self.height = 251
 
         # start with text box centered at mouse pointer position
         self.left, self.top = mousePosition()  
@@ -240,16 +241,35 @@ class EmojiPickerWindow(QWidget):
         # topmost window layout 
         layout = QVBoxLayout() 
 
+        global layoutStack
+        layoutStack = QStackedLayout()
+        layoutStackWidget = QWidget()
+        layoutStackWidget.setLayout(layoutStack)
+
         # scroll area setup shenanigans
         scrollArea = QScrollArea() 
         gridWidget = QWidget()
         global emojiGridLayout
         emojiGridLayout = QGridLayout(gridWidget)
         emojiGridLayout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-        # gridWidget.setStyleSheet("QLabel:hover{background-color:palette(highlight);}")
+
+
+
+        # stretch grid to widget
+        for col in range(emojiGridColumnCount):
+            emojiGridLayout.setColumnStretch(col,1)
+        for row in range(emojiGridRowCount):
+            emojiGridLayout.setRowStretch(row,1)
+
         scrollArea.setWidget(gridWidget)
         scrollArea.setWidgetResizable(True)
-        layout.addWidget(scrollArea)
+        layoutStack.addWidget(scrollArea)
+
+        # info to show when no emoji has been found
+        noEmojiFoundLabel = QLabel("No emoji found 🙁")
+        noEmojiFoundLabel.setAlignment(Qt.AlignCenter | Qt.AlignHCenter | Qt.AlignVCenter)
+        layoutStack.addWidget(noEmojiFoundLabel)     
+        layout.addWidget(layoutStackWidget)
 
         # fill with a placeholder for now (smiling or smile)
         # execute_search('smil')
@@ -315,6 +335,7 @@ class QClickableLabel(QLabel):
 class QLineEditWithArrows(QLineEdit):
     def keyPressEvent(self, ev):
         global selectedEmojiChar
+        global foundAnyEmoji
         if(ev.key() == Qt.Key_Right):
             move_selection("right")
         if(ev.key() == Qt.Key_Left):
@@ -324,7 +345,10 @@ class QLineEditWithArrows(QLineEdit):
         if(ev.key() == Qt.Key_Down):
             move_selection("down")
         if(ev.key() == Qt.Key_Return or ev.key() == Qt.Key_Enter):
-            execute_emoji(selectedEmojiChar)
+            if foundAnyEmoji:
+                execute_emoji(selectedEmojiChar)
+            else:
+                quitNicely()
         if(ev.key() == Qt.Key_Tab):
             pass
         else:
@@ -332,7 +356,5 @@ class QLineEditWithArrows(QLineEdit):
     
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    
-
     ex = EmojiPickerWindow()
     sys.exit(app.exec_())
