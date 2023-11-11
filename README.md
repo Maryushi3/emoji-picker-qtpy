@@ -1,19 +1,22 @@
 # emoji-picker-qtpy
 PyQt5-🅱️ased emoji picker
 
+## ⚠ This project got archived lmao 😂 ⚠
+
+I've moved back to Windows full-time (don't worry, I still use WSL daily). So I don't have any personal reason to continue working on this project, neither would I if things kept constantly breaking, the Linux-way. Sooooo... it's left just barely working. And if you are a full-time Linux user, you'll probably figure out how to make it work better for you (or you don't use emoji's at all, boooooriiiiing... 🥱)
+
 ## Why? 🤔
 
 Because KDE Plasma's _Emoji Picker_ (`plasma.emojier`) neither goes to search textbox automatically nor allows user to navigate using arrow keys 🤦
 
 ## What it does? (features) 🤸
 
-- alows to search emoji by name
-- emoji can be selected using keyboard arrows
+- allows to search emoji by name
+- emoji can be selected using keyboard arrow keys
 - copies selected emoji to system clipboard
-- immediately pastes selected emoji, assuming the picker was summoned with a text box focused
+- immediately pastes selected emoji (I assumed the picker is to always be summoned with a text box focused)
 - closes on focus lost, `Esc` key pressed or emoji selected
 - displayed emoji count is limited by how many of them fit inside the widget
-
 
 ## Dependencies 🧰
 
